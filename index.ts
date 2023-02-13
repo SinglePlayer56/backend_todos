@@ -19,6 +19,7 @@ connection.once('open', () => {
 
 const PORT = process.env.PORT || 3000;
 
+app.use(express.json());
 app.use('/api', todos);
 
 app.listen(PORT, () => console.log(`Server is running in PORT: ${PORT}`));

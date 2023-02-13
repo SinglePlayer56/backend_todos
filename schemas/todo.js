@@ -5,9 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const Schema = mongoose_1.default.Schema;
-const DocumentSchema = new Schema({
-    field: { type: String, required: true },
-    field2: { type: Number, required: true }
+const TodoSchema = new Schema({
+    text: { type: String, required: true },
+    completed: { type: Boolean, required: true }
 });
-const Document = mongoose_1.default.model('Document', DocumentSchema);
-exports.default = Document;
+const Todo = mongoose_1.default.model('Todo', TodoSchema);
+exports.default = Todo;

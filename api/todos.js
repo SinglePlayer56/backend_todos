@@ -13,23 +13,64 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const test_1 = __importDefault(require("../schemas/test"));
+const todo_1 = __importDefault(require("../schemas/todo"));
 const router = express_1.default.Router();
 router.get('/todos', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const newDocument = new test_1.default({
-            field: 'field1',
-            field2: 2
-        });
-        yield newDocument.save();
-        res.json({
-            status: 200,
-            message: "Работает блять!"
-        });
+        const todos = yield todo_1.default.find();
+        return res.json(todos);
     }
     catch (e) {
-        console.error(e);
-        return res.status(500).send('Server error');
+        if (e instanceof Error) {
+            return res.status(500).send(e.message);
+        }
+    }
+}));
+router.post('/todo', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { text, completed = false } = req.body;
+    try {
+        const newTodo = new todo_1.default({
+            text,
+            completed
+        });
+        yield newTodo.save();
+        return res.json(newTodo);
+    }
+    catch (e) {
+        if (e instanceof Error) {
+            return res.status(500).send(e.message);
+        }
+    }
+}));
+router.put('/todo/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const { text, completed } = req.body;
+        const todo = yield todo_1.default.findByIdAndUpdate(id, { text, completed }, { new: true });
+        if (!todo) {
+            return res.status(404).send('Todo not found');
+        }
+        return res.json(todo);
+    }
+    catch (e) {
+        if (e instanceof Error) {
+            return res.status(500).send(e.message);
+        }
+    }
+}));
+router.delete('/todo/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const todo = yield todo_1.default.findByIdAndDelete(id);
+        if (!todo) {
+            return res.status(404).send('Todo not found');
+        }
+        return res.json(todo);
+    }
+    catch (e) {
+        if (e instanceof Error) {
+            return res.status(500).send(e.message);
+        }
     }
 }));
 exports.default = router;
