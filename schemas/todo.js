@@ -8,6 +8,6 @@ const Schema = mongoose_1.default.Schema;
 const TodoSchema = new Schema({
     text: { type: String, required: true },
     completed: { type: Boolean, required: true }
-});
+}, { versionKey: false });
 const Todo = mongoose_1.default.model('Todo', TodoSchema);
 exports.default = Todo;

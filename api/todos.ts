@@ -1,15 +1,19 @@
 import express, {Request} from 'express';
 import Todo, {ITodo} from '../schemas/todo';
+import {DtoGetTodo, DtoGetTodos} from "../dto/dto.todo";
+
 const router = express.Router();
 
-
-type reqTodo = Request & { body: ITodo };
+interface reqTodo extends Request {
+    body: ITodo;
+}
 
 router.get('/todos', async (req, res) => {
     try {
         const todos = await Todo.find();
 
-        return res.json(todos);
+        const dtoTodos = new DtoGetTodos(todos);
+        return res.json(dtoTodos.todos);
     } catch (e: unknown) {
         if (e instanceof Error) {
             return res.status(500).send(e.message);
@@ -17,21 +21,41 @@ router.get('/todos', async (req, res) => {
     }
 });
 
-router.post('/todo', async (req: reqTodo, res) => {
-    const {text, completed = false} = req.body;
+router.get('/todo/:id', async (req, res) => {
+    try {
+        const {id} = req.params;
 
-    try{
+        const todo = await Todo.findById({_id:id});
+
+        if (!todo) {
+            return res.status(404).send('Todo not found');
+        }
+
+        const dtoTodo = new DtoGetTodo(todo);
+
+        return res.json(dtoTodo);
+    } catch (e) {
+
+    }
+})
+
+router.post('/todo', async (req: reqTodo, res) => {
+    const {text} = req.body;
+
+    try {
         const newTodo = new Todo<ITodo>({
             text,
-            completed
+            completed: false
         });
 
         await newTodo.save();
 
-        return res.json(newTodo);
+        const dtoTodo = new DtoGetTodo(newTodo);
+
+        return res.json(dtoTodo);
     } catch (e: unknown) {
         if (e instanceof Error) {
-            return  res.status(500).send(e.message);
+            return res.status(500).send(e.message);
         }
     }
 });
@@ -47,7 +71,9 @@ router.put('/todo/:id', async (req: reqTodo, res) => {
             return res.status(404).send('Todo not found');
         }
 
-        return res.json(todo);
+        const dtoTodo = new DtoGetTodo(todo);
+
+        return res.json(dtoTodo);
     } catch (e) {
         if (e instanceof Error) {
             return res.status(500).send(e.message);
@@ -65,7 +91,9 @@ router.delete('/todo/:id', async (req, res) => {
             return res.status(404).send('Todo not found');
         }
 
-        return res.json(todo);
+        const dtoTodo = new DtoGetTodo(todo);
+
+        return res.json(dtoTodo);
     } catch (e: unknown) {
         if (e instanceof Error) {
             return res.status(500).send(e.message);

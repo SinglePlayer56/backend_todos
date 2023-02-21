@@ -15,7 +15,7 @@ connection.on('error', (error) => {
 connection.once('open', () => {
     console.log('Connected to the database');
 });
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.use(express_1.default.json());
 app.use('/api', todos_1.default);
 app.listen(PORT, () => console.log(`Server is running in PORT: ${PORT}`));

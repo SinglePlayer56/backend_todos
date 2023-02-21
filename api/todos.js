@@ -14,11 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const todo_1 = __importDefault(require("../schemas/todo"));
+const dto_todo_1 = require("../dto/dto.todo");
 const router = express_1.default.Router();
 router.get('/todos', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const todos = yield todo_1.default.find();
-        return res.json(todos);
+        const dtoTodos = new dto_todo_1.DtoGetTodos(todos);
+        return res.json(dtoTodos.todos);
     }
     catch (e) {
         if (e instanceof Error) {
@@ -26,15 +28,29 @@ router.get('/todos', (req, res) => __awaiter(void 0, void 0, void 0, function* (
         }
     }
 }));
+router.get('/todo/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const todo = yield todo_1.default.findById({ _id: id });
+        if (!todo) {
+            return res.status(404).send('Todo not found');
+        }
+        const dtoTodo = new dto_todo_1.DtoGetTodo(todo);
+        return res.json(dtoTodo);
+    }
+    catch (e) {
+    }
+}));
 router.post('/todo', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { text, completed = false } = req.body;
+    const { text } = req.body;
     try {
         const newTodo = new todo_1.default({
             text,
-            completed
+            completed: false
         });
         yield newTodo.save();
-        return res.json(newTodo);
+        const dtoTodo = new dto_todo_1.DtoGetTodo(newTodo);
+        return res.json(dtoTodo);
     }
     catch (e) {
         if (e instanceof Error) {
@@ -50,7 +66,8 @@ router.put('/todo/:id', (req, res) => __awaiter(void 0, void 0, void 0, function
         if (!todo) {
             return res.status(404).send('Todo not found');
         }
-        return res.json(todo);
+        const dtoTodo = new dto_todo_1.DtoGetTodo(todo);
+        return res.json(dtoTodo);
     }
     catch (e) {
         if (e instanceof Error) {
@@ -65,7 +82,8 @@ router.delete('/todo/:id', (req, res) => __awaiter(void 0, void 0, void 0, funct
         if (!todo) {
             return res.status(404).send('Todo not found');
         }
-        return res.json(todo);
+        const dtoTodo = new dto_todo_1.DtoGetTodo(todo);
+        return res.json(dtoTodo);
     }
     catch (e) {
         if (e instanceof Error) {
