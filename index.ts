@@ -20,7 +20,7 @@ connection.once('open', () => {
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-    origin: 'https://todo-app-inky-five.vercel.app',
+    origin: ['https://todo-app-inky-five.vercel.app', 'http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
 app.use(express.json());
